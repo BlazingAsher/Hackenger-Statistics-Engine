@@ -4,6 +4,7 @@ const CryptoJS = require('crypto-js');
 const base64 = require('base-64');
 
 const StatEntry = require('../models/StatEntry')
+const stats = require('../services/stats');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -33,6 +34,10 @@ router.post('/reportInternal', function(req, res, next){
     return res.json({"status": "OK"});
   })
 
+})
+
+router.get('/stats', function(req, res, next){
+  return res.json({"status": "OK", "stats": stats.getStats()})
 })
 
 router.get('/testData', function(req, res, next){

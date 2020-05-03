@@ -10,6 +10,8 @@ const database = process.env.DATABASE || 'mongodb://localhost:27017';
 var indexRouter = require('./routes/index');
 const rateLimit = require("express-rate-limit");
 
+const stats = require('./services/stats');
+
 var app = express();
 
 app.use(logger('dev'));
@@ -22,13 +24,22 @@ const limiter = rateLimit({
     max: 1 // limit each IP to 100 requests per windowMs
 });
 
-app.use('/report', limiter);
+const statLimiter = rateLimit({
+    windowMs: 1000, // 1 second
+    max: 1 // limit each IP to 100 requests per windowMs
+});
+
+if(process.env.ENV !== 'development'){
+    app.use('/report', limiter);
+    app.use('/stats', statLimiter);
+}
 
 app.use('/', indexRouter);
 
 mongoose.connect(database, {server: {auto_reconnect: true}})
     .then(() => {
         console.log("Connected to MongoDB")
+        stats.startService();
     })
     .catch(error => {
         console.log("DB CONNECTION ERROR");
