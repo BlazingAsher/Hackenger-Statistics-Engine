@@ -22,6 +22,10 @@ router.post('/report', function(req, res, next){
 })
 
 router.post('/reportInternal', function(req, res, next){
+  if(!req.body["key"] || req.body["key"].toString() !== process.env.INTERNAL_KEY){
+    return res.json({"status": "UNAUTHORIZED"});
+  }
+
   let reportInfo = req.body["info"];
 
   StatEntry.create(reportInfo, function(err, result){
@@ -32,14 +36,15 @@ router.post('/reportInternal', function(req, res, next){
 })
 
 router.get('/testData', function(req, res, next){
+  if(process.env.ENV !== 'development'){
+    return res.json({"status": "UNAUTHORIZED"})
+  }
   let testData = {
     timestamp: Date.now(),
     question: 1,
-    state: "done",
-    namespace: "hackenger1"
+    state: "testing",
+    namespace: "ns_test"
   }
-  console.log(JSON.stringify(testData))
-  console.log(CryptoJS.AES.encrypt(JSON.stringify(testData), process.env.SECRET))
   return res.json({data: base64.encode(CryptoJS.AES.encrypt(JSON.stringify(testData), process.env.SECRET).toString())});
 })
 
