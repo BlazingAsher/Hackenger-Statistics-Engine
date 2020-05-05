@@ -9,10 +9,14 @@ function getAllKeyPrefix(state){
     return "all"+state[0].toUpperCase()+state.substring(1);
 }
 
+function getFreqKeyPrefix(state){
+    return "freq"+state[0].toUpperCase()+state.substring(1);
+}
+
 async function calculateStats() {
     let statDocs = StatEntry.find({});
     statDocs = await statDocs;
-    //console.log(statDocs);
+    console.log(statDocs);
 
     let stats = {}
 
@@ -33,16 +37,28 @@ async function calculateStats() {
         if(stats[nsp][question][state] === undefined){
             stats[nsp][question][state] = 0
             stats[nsp][question][getLastKeyPrefix(state)] = 0;
-            stats[nsp][question][getAllKeyPrefix(state)] = [];
+            //stats[nsp][question][getAllKeyPrefix(state)] = [];
+            stats[nsp][question][getFreqKeyPrefix(state)] = {};
         }
 
         let lState = getLastKeyPrefix(state);
-        let aState = getAllKeyPrefix(state);
+        //let aState = getAllKeyPrefix(state);
+        let fState = getFreqKeyPrefix(state);
 
-        stats[nsp][question][state] += 1
-        stats[nsp][question][aState].push(timestamp);
+        stats[nsp][question][state] += 1;
+        //stats[nsp][question][aState].push(timestamp);
         if(stats[nsp][question][lState] < timestamp){
             stats[nsp][question][lState] = timestamp;
+        }
+
+        if(stats[nsp][question][fState][timestamp] === undefined){
+            stats[nsp][question][fState][timestamp] = 0;
+        }
+        stats[nsp][question][fState][timestamp] += 1;
+
+        gStats = {
+            "data": stats,
+            "timestamp": Date.now()
         }
 
     }

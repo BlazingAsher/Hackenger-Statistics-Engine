@@ -4,6 +4,8 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var cors = require('cors');
+
 const mongoose = require('mongoose');
 const database = process.env.DATABASE || 'mongodb://localhost:27017';
 
@@ -18,6 +20,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors())
 
 const limiter = rateLimit({
     windowMs: 10 * 1000, // 10 seconds
