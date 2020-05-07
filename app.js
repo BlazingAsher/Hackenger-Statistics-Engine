@@ -1,20 +1,25 @@
 require('dotenv').config()
 
-var express = require('express');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const fs = require('fs');
 
-var cors = require('cors');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+
+const cors = require('cors');
 
 const mongoose = require('mongoose');
 const database = process.env.DATABASE || 'mongodb://localhost:27017';
 
-var indexRouter = require('./routes/index');
+const indexRouter = require('./routes/index');
 const rateLimit = require("express-rate-limit");
 
 const stats = require('./services/stats');
+const submissionHandler = require('./services/submissionHandler');
 
-var app = express();
+submissionHandler.init(JSON.parse(fs.readFileSync('questions.json', 'utf8')));
+
+let app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -34,6 +39,7 @@ const statLimiter = rateLimit({
 
 if(process.env.ENV !== 'development'){
     app.use('/report', limiter);
+    app.use('/submit', limiter);
     app.use('/stats', statLimiter);
 }
 

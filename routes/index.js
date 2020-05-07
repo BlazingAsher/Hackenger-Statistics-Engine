@@ -1,10 +1,12 @@
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let router = express.Router();
 const CryptoJS = require('crypto-js');
 const base64 = require('base-64');
 
-const StatEntry = require('../models/StatEntry')
+const StatEntry = require('../models/StatEntry');
 const stats = require('../services/stats');
+
+const submissionHandler = require('../services/submissionHandler');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -12,8 +14,15 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/report', function(req, res, next){
+  if(req.body.info === undefined){
+    return res.json({
+      "status": "BAD REQUEST"
+    })
+  }
   let reportEncoded = req.body["info"];
-  let reportInfo = JSON.parse(CryptoJS.AES.decrypt(base64.decode(reportEncoded), process.env.SECRET).toString(CryptoJS.enc.Utf8));
+  //let reportInfo = JSON.parse(CryptoJS.AES.decrypt(base64.decode(reportEncoded), process.env.SECRET).toString(CryptoJS.enc.Utf8));
+  let reportInfo = req.body["info"];
+  reportInfo["timestamp"] = Date.now(); // trust our timestamp
 
   StatEntry.create(reportInfo, function(err, result){
     if(err) return res.json({"status": "ERROR"});
@@ -40,6 +49,10 @@ router.get('/stats', function(req, res, next){
   return res.json({"status": "OK", "stats": stats.getStats()})
 })
 
+router.get('/updateFrequency', function (req, res, next){
+  return res.json({"status": "OK", "frequency": process.env.UPDATE_FREQUENCY});
+})
+
 router.get('/testData', function(req, res, next){
   if(process.env.ENV !== 'development'){
     return res.json({"status": "UNAUTHORIZED"})
@@ -51,6 +64,18 @@ router.get('/testData', function(req, res, next){
     namespace: "ns_test"
   }
   return res.json({data: base64.encode(CryptoJS.AES.encrypt(JSON.stringify(testData), process.env.SECRET).toString())});
+})
+
+router.post('/submit', function(req, res, next){
+  if(req.body.namespace === undefined || req.body.question === undefined || req.body.answer === undefined){
+    return res.json({
+      "status": "BAD REQUEST"
+    })
+  }
+  return res.json({
+    "status": "OK",
+    "result": submissionHandler.verifySubmission(req.body.namespace, req.body.question, req.body.answer)
+  })
 })
 
 module.exports = router;
