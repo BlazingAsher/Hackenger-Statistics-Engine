@@ -21,6 +21,8 @@ submissionHandler.init(JSON.parse(fs.readFileSync('questions.json', 'utf8')));
 
 let app = express();
 
+app.enable('trust proxy');
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
