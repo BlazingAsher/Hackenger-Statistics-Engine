@@ -23,7 +23,7 @@ router.post('/report', function(req, res, next){
   let reportEncoded = req.body["info"];
   //let reportInfo = JSON.parse(CryptoJS.AES.decrypt(base64.decode(reportEncoded), process.env.SECRET).toString(CryptoJS.enc.Utf8));
   let reportInfo = req.body["info"];
-  reportInfo["timestamp"] = Date.now(); // trust our timestamp
+  reportInfo["timestamp"] = Math.round(Date.now()/1000); // trust our timestamp
 
   StatEntry.create(reportInfo, function(err, result){
     if(err) return res.json({"status": "ERROR"});
