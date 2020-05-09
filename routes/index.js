@@ -4,6 +4,7 @@ const CryptoJS = require('crypto-js');
 const base64 = require('base-64');
 
 const StatEntry = require('../models/StatEntry');
+const SubmitEntry = require('../models/SubmitEntry');
 const stats = require('../services/stats');
 
 const submissionHandler = require('../services/submissionHandler');
@@ -72,10 +73,23 @@ router.post('/submit', function(req, res, next){
       "status": "BAD REQUEST"
     })
   }
-  return res.json({
-    "status": "OK",
-    "result": submissionHandler.verifySubmission(req.body.namespace, req.body.question, req.body.answer)
+  SubmitEntry.create({
+    timestamp: Date.now(),
+    namespace: req.body.namespace,
+    question: req.body.question,
+    submission: req.body.answer
+  }, function(err, result){
+    if(err){
+      console.log("Error creating submission entry.");
+      console.log(err);
+    }
+
+    return res.json({
+      "status": "OK",
+      "result": submissionHandler.verifySubmission(req.body.namespace, req.body.question, req.body.answer)
+    })
   })
+
 })
 
 module.exports = router;
