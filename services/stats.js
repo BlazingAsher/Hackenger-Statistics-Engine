@@ -9,7 +9,9 @@ async function calculateStats() {
 
     for (let statDoc of statDocs){
         let nsp = statDoc["namespace"];
-        let timestamp = statDoc["timestamp"];
+        let timestampLong = statDoc["timestamp"];
+        // round to nearest minute for chart purposes
+        let timestamp = Math.round(Math.round(timestampLong/60) * 60)
         let state = statDoc["state"];
         let question = statDoc["question"];
 
@@ -29,8 +31,8 @@ async function calculateStats() {
         }
 
         stats[nsp][question][state]["num"] += 1;
-        if(stats[nsp][question][state]["lastTrigger"] < timestamp){
-            stats[nsp][question][state]["lastTrigger"] = timestamp;
+        if(stats[nsp][question][state]["lastTrigger"] < timestampLong){
+            stats[nsp][question][state]["lastTrigger"] = timestampLong;
         }
 
         if(stats[nsp][question][state]["freq"][timestamp] === undefined){
