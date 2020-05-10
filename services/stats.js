@@ -62,8 +62,8 @@ async function calculateStats() {
                     datasets: [{
                         label: 'Events',
                         data: formattedData,
-                        backgroundColor: 'rgba(5, 25, 48, 0.9)'
-                        //cubicInterpolationMode: 'monotone'
+                        backgroundColor: 'rgba(5, 25, 48, 0.9)',
+                        cubicInterpolationMode: 'monotone'
                     }]
                 };
 
