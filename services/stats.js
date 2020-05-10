@@ -58,14 +58,15 @@ async function calculateStats() {
                         );
                     }
                 }
-                stats[nsp][ques][eve]["chartData"] = {
-                    datasets: [{
-                        label: 'Events',
-                        data: formattedData,
-                        backgroundColor: 'rgba(5, 25, 48, 0.9)',
-                        cubicInterpolationMode: 'monotone'
-                    }]
-                };
+                // stats[nsp][ques][eve]["chartData"] = {
+                //     datasets: [{
+                //         label: 'Events',
+                //         data: formattedData,
+                //         backgroundColor: 'rgba(5, 25, 48, 0.9)',
+                //         cubicInterpolationMode: 'monotone'
+                //     }]
+                // };
+                stats[nsp][ques][eve]["chartData"] = formattedData;
 
             }
         }
