@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const StatEntry = require('../models/StatEntry');
 let SubmissionHandler = {}
 
 let questionData = {}
@@ -32,6 +33,15 @@ SubmissionHandler.verifySubmission = function (namespace, question, answer){
     }
 
     let matches = thisQuestionData["answers"].includes(answer)
+
+    StatEntry.create({
+        timestamp: Math.round(Date.now()/1000),
+        namespace: namespace,
+        question: question,
+        state: matches ? "correct" : "incorrect"
+    }, function(err, result){
+        if(err) console.log(err);
+    });
 
     if(matches){
         let returnData = thisQuestionData["actionPacket"];
